@@ -1,11 +1,11 @@
 (function () {
   'use strict';
-
+  /* global validation */
   var module = angular.module('validation', []);
 
   module.factory('Validator', function () {
     return validation.Validator;
-  })
+  });
 
   module.factory('ValidatorRuleComponent', function () {
     return validation.ValidatorRuleComponent;
@@ -14,6 +14,13 @@
   module.factory('ValidatorRule', function () {
     return validation.ValidatorRule;
   });
+
+  function validatorFunction (component, validationScope) {
+    return function (modelValue, viewValue) {
+      var result = component.run(validationScope, viewValue);
+      return !result.error;
+    };
+  }
 
   module.directive('validationTarget', function () {
     return {
@@ -40,10 +47,7 @@
           var component = components[i];
           var name = component.name;
 
-          ctrl.$validators[name] = function (modelValue, viewValue) {
-            var result = component.run(validationScope, viewValue);
-            return !result.error;
-          }
+          ctrl.$validators[name] = validatorFunction(component, validationScope);
         }
       }
     };
